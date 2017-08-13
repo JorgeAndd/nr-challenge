@@ -35,8 +35,8 @@ The mongo object is stored in the following format
     abertura : String,
     id       : String
     documents: Array [{
-                                nome: String
-                                url : String
+                         nome: String
+                         url : String
                       }]
     }
 ```
