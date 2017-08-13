@@ -8,24 +8,43 @@ function crawl()
     var crawler = Crawler('http://www.cl.df.gov.br/pt_PT/pregoes');
 
     // crawler configuration
-    crawler.interval = 100; // 0.5 second
+    crawler.interval = 100;
     crawler.maxConcurrency = 15;
 
     // crawler conditions
     crawler.addFetchCondition(function(queueItem, referrerQueueItem, callback) {
-        callback(null, queueItem.path.match(/\/pt_PT\/pregoes\//));
-    })
+        var match = queueItem.path.match(/\/pt_PT\/pregoes\/-\/document_library_display/);
+        
+        callback(null, match);    
+    });
 
     // crawler events
     crawler.on('crawlstart', function() {
-        console.log('crawler started' + crawler.maxDepth);
+        console.log('crawler started');
     });
 
-    crawler.on('fetchcomplete', function(queueItem, responseBuffer, response) {
-        // If path matches a pregão page, calls the scrapper
-        if(queueItem.path.match(/\/pt_PT\/pregoes\/-\/document_library_display\/.*document_library_display/)) 
+    crawler.on('fetchcomplete', function(queueItem, responseBuffer, response) {        
+        var match = queueItem.path.match(/\/pt_PT\/pregoes\/-\/document_library_display\/ou5V\/view\/(\d*)$/)
+        
+        if(match) 
         {
+            // Matches a pregão page
+
+            var id = match[1];
+
             scrapper.parse(responseBuffer);
+        }
+        else
+        {
+            match = queueItem.path.match(/\/pt_PT\/pregoes\/-\/document_library_display\/ou5V\/view\/(\d*)\/(\d*)/);
+            if(match)
+            {
+                // Matches a file page
+
+                var id = match[1];
+                
+                scrapper.parseDocumentPage(responseBuffer);
+            }
         }
     });
 
