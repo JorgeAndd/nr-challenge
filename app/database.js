@@ -1,5 +1,5 @@
 var mongo = require('mongodb').MongoClient,
-    config = require('./config.js');
+    config = require('../config/config.js');
 
 var db;
 

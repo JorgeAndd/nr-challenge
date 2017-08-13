@@ -2,9 +2,9 @@
   "name": "nr-challenge",
   "version": "1.0.0",
   "description": "Public biddings web crawler",
-  "main": "index.js",
+  "main": "crawler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./app/crawler.js"
   },
   "author": "",
   "license": "ISC",
