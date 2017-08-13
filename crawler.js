@@ -1,7 +1,10 @@
-var Crawler = require('simplecrawler');
-    scrapper = require('./scrapper.js');
+var Crawler = require('simplecrawler'),
+    scrapper = require('./scrapper.js'),
+    db = require('./database.js')
 
-crawl();
+db.connect(function() {
+    crawl();
+});
 
 function crawl() 
 {
@@ -20,30 +23,40 @@ function crawl()
 
     // crawler events
     crawler.on('crawlstart', function() {
-        console.log('crawler started');
+        console.log('crawling pages...');
+        console.log('please wait for crawling to finish');
     });
 
     crawler.on('fetchcomplete', function(queueItem, responseBuffer, response) {        
         var match = queueItem.path.match(/\/pt_PT\/pregoes\/-\/document_library_display\/ou5V\/view\/(\d*)$/)
         
-        if(match) 
-        {
+        if (match) {
             // Matches a pregão page
 
+            var url = queueItem.url;
             var id = match[1];
 
-            scrapper.parse(responseBuffer);
-        }
-        else
-        {
+            pregao = scrapper.parse(responseBuffer);
+
+            if (pregao) {
+                pregao.id = id;
+                pregao.url = url;
+                db.storePregao(pregao);
+            }
+                
+        } else {
             match = queueItem.path.match(/\/pt_PT\/pregoes\/-\/document_library_display\/ou5V\/view\/(\d*)\/(\d*)/);
-            if(match)
+            if (match)
             {
                 // Matches a file page
 
                 var id = match[1];
                 
-                scrapper.parseDocumentPage(responseBuffer);
+                document = scrapper.parseDocumentPage(responseBuffer);
+
+                if(document) {
+                    db.storeAttachment(id, document);
+                }
             }
         }
     });

@@ -28,7 +28,7 @@ module.exports = {
         var title = $('#breadcrumbs .last span a').text(); 
 
         // Ignores page if title does not starts with 'Pregão'
-        if(title.indexOf('Pregão') == -1)
+        if (title.indexOf('Pregão') == -1)
             return;
 
         var nome;
@@ -43,8 +43,12 @@ module.exports = {
     parseDocumentPage: function(html) {
         var $ = cheerio.load(html);
 
+        var nome = $('.header-title span').text().trim();
         var url = $('.lfr-asset-field input').attr('value');
 
-        return url;
+        if(nome == null || url == null)
+            return null;
+        else
+            return {nome: nome, url: url};
     }
 }
